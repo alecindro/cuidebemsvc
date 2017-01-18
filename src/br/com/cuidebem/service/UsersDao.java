@@ -5,6 +5,7 @@
  */
 package br.com.cuidebem.service;
 
+import br.com.cuidebem.control.exceptions.DaoException;
 import br.com.cuidebem.model.Users;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
@@ -27,6 +28,14 @@ public class UsersDao extends AbstractDao<Users> {
 
     public UsersDao() {
         super(Users.class);
+    }
+    public void confirmaAceite(String email) throws DaoException{
+    	Users user = find(email);
+    	if(user == null){
+    		throw new DaoException("Usuário não encontrado: "+email);
+    	}
+    	user.setBlocked(false);
+    	edit(user);
     }
     
 }

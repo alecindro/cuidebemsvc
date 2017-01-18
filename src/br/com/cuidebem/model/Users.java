@@ -6,6 +6,8 @@
 package br.com.cuidebem.model;
 
 import java.io.Serializable;
+import java.util.Date;
+
 import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -13,6 +15,8 @@ import javax.persistence.Id;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
 import javax.persistence.UniqueConstraint;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
@@ -30,7 +34,11 @@ import javax.xml.bind.annotation.XmlRootElement;
     @NamedQuery(name = "Users.findAll", query = "SELECT u FROM Users u")
     , @NamedQuery(name = "Users.findByEmail", query = "SELECT u FROM Users u WHERE u.email = :email")
     , @NamedQuery(name = "Users.findByPassword", query = "SELECT u FROM Users u WHERE u.password = :password")
-    , @NamedQuery(name = "Users.findByTypeuser", query = "SELECT u FROM Users u WHERE u.typeuser = :typeuser")})
+    , @NamedQuery(name = "Users.findByTypeuser", query = "SELECT u FROM Users u WHERE u.typeuser = :typeuser")
+    , @NamedQuery(name = "Users.findByNome", query = "SELECT u FROM Users u WHERE u.nome = :nome")
+    , @NamedQuery(name = "Users.findByBlocked", query = "SELECT u FROM Users u WHERE u.blocked = :blocked")
+    , @NamedQuery(name = "Users.findByDatacadastro", query = "SELECT u FROM Users u WHERE u.datacadastro = :datacadastro")})
+
 public class Users implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -55,6 +63,13 @@ public class Users implements Serializable {
     @Size(min = 1, max = 255)
     @Column(name = "nome", nullable = false, length = 255)
     private String nome;
+    @Column(name = "blocked")
+    private boolean blocked;
+    @Basic(optional = false)
+    @NotNull
+    @Column(name = "datacadastro")
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date datacadastro;
 
     public Users() {
     }
@@ -101,6 +116,22 @@ public class Users implements Serializable {
 	public void setNome(String nome) {
 		this.nome = nome;
 	}
+	
+	   public boolean getBlocked() {
+	        return blocked;
+	    }
+
+	    public void setBlocked(boolean blocked) {
+	        this.blocked = blocked;
+	    }
+	
+    public Date getDatacadastro() {
+        return datacadastro;
+    }
+
+    public void setDatacadastro(Date datacadastro) {
+        this.datacadastro = datacadastro;
+    }
 
 	@Override
     public int hashCode() {
