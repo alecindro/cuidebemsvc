@@ -7,28 +7,30 @@ package br.com.cuidebem.model;
 
 import java.io.Serializable;
 import java.util.Date;
-
+import java.util.List;
 import javax.persistence.Basic;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.Id;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
-import javax.persistence.UniqueConstraint;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlTransient;
 
 /**
  *
  * @author aleci
  */
 @Entity
-@Table(name = "users", uniqueConstraints = {
-    @UniqueConstraint(columnNames = {"email"})})
+@Table(name = "users")
 @XmlRootElement
 @NamedQueries({
     @NamedQuery(name = "Users.findAll", query = "SELECT u FROM Users u")
@@ -38,8 +40,14 @@ import javax.xml.bind.annotation.XmlRootElement;
     , @NamedQuery(name = "Users.findByNome", query = "SELECT u FROM Users u WHERE u.nome = :nome")
     , @NamedQuery(name = "Users.findByBlocked", query = "SELECT u FROM Users u WHERE u.blocked = :blocked")
     , @NamedQuery(name = "Users.findByDatacadastro", query = "SELECT u FROM Users u WHERE u.datacadastro = :datacadastro")})
-
 public class Users implements Serializable {
+
+    @Basic(optional = false)
+    @Column(name = "alterLogin")
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date alterLogin;
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "email", fetch = FetchType.LAZY)
+    private List<UsersPaciente> usersPacienteList;
 
     private static final long serialVersionUID = 1L;
     // @Pattern(regexp="[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?", message="E-mail inválido")//if the field contains email address consider using this annotation to enforce field validation
@@ -47,21 +55,21 @@ public class Users implements Serializable {
     @Basic(optional = false)
     @NotNull
     @Size(min = 1, max = 255)
-    @Column(name = "email", nullable = false, length = 255)
+    @Column(name = "email")
     private String email;
     @Basic(optional = false)
     @NotNull
     @Size(min = 1, max = 255)
-    @Column(name = "password", nullable = false, length = 255)
+    @Column(name = "password")
     private String password;
     @Basic(optional = false)
     @NotNull
-    @Column(name = "typeuser", nullable = false)
+    @Column(name = "typeuser")
     private int typeuser;
     @Basic(optional = false)
     @NotNull
     @Size(min = 1, max = 255)
-    @Column(name = "nome", nullable = false, length = 255)
+    @Column(name = "nome")
     private String nome;
     @Column(name = "blocked")
     private boolean blocked;
@@ -70,6 +78,10 @@ public class Users implements Serializable {
     @Column(name = "datacadastro")
     @Temporal(TemporalType.TIMESTAMP)
     private Date datacadastro;
+    @Basic(optional = false)
+    @Column(name = "activation")
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date activation;
 
     public Users() {
     }
@@ -78,11 +90,19 @@ public class Users implements Serializable {
         this.email = email;
     }
 
-    public Users(String email, String password, int typeuser, String nome) {
+    public Users(String email, String password, int typeuser, String nome, Date datacadastro) {
         this.email = email;
         this.password = password;
         this.typeuser = typeuser;
         this.nome = nome;
+        this.datacadastro = datacadastro;
+    }
+    
+    public Users(String email, String password, int typeuser, String nome){
+    	   this.email = email;
+           this.password = password;
+           this.typeuser = typeuser;
+           this.nome = nome;
     }
 
     public String getEmail() {
@@ -108,23 +128,23 @@ public class Users implements Serializable {
     public void setTypeuser(int typeuser) {
         this.typeuser = typeuser;
     }
-    
+
     public String getNome() {
-		return nome;
-	}
+        return nome;
+    }
 
-	public void setNome(String nome) {
-		this.nome = nome;
-	}
-	
-	   public boolean getBlocked() {
-	        return blocked;
-	    }
+    public void setNome(String nome) {
+        this.nome = nome;
+    }
 
-	    public void setBlocked(boolean blocked) {
-	        this.blocked = blocked;
-	    }
-	
+    public boolean isBlocked() {
+        return blocked;
+    }
+
+    public void setBlocked(Boolean blocked) {
+        this.blocked = blocked;
+    }
+
     public Date getDatacadastro() {
         return datacadastro;
     }
@@ -133,7 +153,7 @@ public class Users implements Serializable {
         this.datacadastro = datacadastro;
     }
 
-	@Override
+    @Override
     public int hashCode() {
         int hash = 0;
         hash += (email != null ? email.hashCode() : 0);
@@ -147,12 +167,42 @@ public class Users implements Serializable {
             return false;
         }
         Users other = (Users) object;
-        return this.email.equals(other.email);
+        if ((this.email == null && other.email != null) || (this.email != null && !this.email.equals(other.email))) {
+            return false;
+        }
+        return true;
     }
 
     @Override
     public String toString() {
-        return "br.com.cuidebem.model.Users[ email=" + email + " ]";
+        return "br.com.cuidebem.control.Users[ email=" + email + " ]";
+    }
+
+    public Date getAlterLogin() {
+        return alterLogin;
+    }
+
+    public void setAlterLogin(Date alterLogin) {
+        this.alterLogin = alterLogin;
+    }
+    
+    
+
+    public Date getActivation() {
+		return activation;
+	}
+
+	public void setActivation(Date activation) {
+		this.activation = activation;
+	}
+
+	@XmlTransient
+    public List<UsersPaciente> getUsersPacienteList() {
+        return usersPacienteList;
+    }
+
+    public void setUsersPacienteList(List<UsersPaciente> usersPacienteList) {
+        this.usersPacienteList = usersPacienteList;
     }
     
 }

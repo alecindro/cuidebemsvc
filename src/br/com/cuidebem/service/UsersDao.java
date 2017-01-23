@@ -5,11 +5,15 @@
  */
 package br.com.cuidebem.service;
 
-import br.com.cuidebem.control.exceptions.DaoException;
-import br.com.cuidebem.model.Users;
+import java.util.Date;
+
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+
+import br.com.cuidebem.control.exceptions.DaoException;
+import br.com.cuidebem.control.exceptions.PreexistingEntityException;
+import br.com.cuidebem.model.Users;
 
 /**
  *
@@ -29,12 +33,16 @@ public class UsersDao extends AbstractDao<Users> {
     public UsersDao() {
         super(Users.class);
     }
-    public void confirmaAceite(String email) throws DaoException{
+    public void confirmaAceite(String email) throws Exception{
     	Users user = find(email);
     	if(user == null){
     		throw new DaoException("Usuário não encontrado: "+email);
     	}
+    	if (!user.isBlocked()){
+    		throw new PreexistingEntityException("usuário já foi desbloqueado");
+    	}
     	user.setBlocked(false);
+    	user.setActivation(new Date());
     	edit(user);
     }
     
