@@ -14,6 +14,8 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.Id;
+import javax.persistence.NamedNativeQueries;
+import javax.persistence.NamedNativeQuery;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
@@ -33,20 +35,28 @@ import javax.xml.bind.annotation.XmlTransient;
 @Table(name = "users")
 @XmlRootElement
 @NamedQueries({
-    @NamedQuery(name = "Users.findAll", query = "SELECT u FROM Users u")
-    , @NamedQuery(name = "Users.findByEmail", query = "SELECT u FROM Users u WHERE u.email = :email")
-    , @NamedQuery(name = "Users.findByPassword", query = "SELECT u FROM Users u WHERE u.password = :password")
-    , @NamedQuery(name = "Users.findByTypeuser", query = "SELECT u FROM Users u WHERE u.typeuser = :typeuser")
-    , @NamedQuery(name = "Users.findByNome", query = "SELECT u FROM Users u WHERE u.nome = :nome")
-    , @NamedQuery(name = "Users.findByBlocked", query = "SELECT u FROM Users u WHERE u.blocked = :blocked")
-    , @NamedQuery(name = "Users.findByDatacadastro", query = "SELECT u FROM Users u WHERE u.datacadastro = :datacadastro")})
+    @NamedQuery(name = "Users.findAll", query = "SELECT u FROM Users u where u.enabled = true")
+    , @NamedQuery(name = "Users.findByEmail", query = "SELECT u FROM Users u WHERE u.email = :email and u.enabled = true")
+    , @NamedQuery(name = "Users.findByPassword", query = "SELECT u FROM Users u WHERE u.password = :password and u.enabled = true")
+    , @NamedQuery(name = "Users.findByTypeuser", query = "SELECT u FROM Users u WHERE u.typeuser = :typeuser and u.enabled = true")
+    , @NamedQuery(name = "Users.findByNome", query = "SELECT u FROM Users u WHERE u.nome = :nome and u.enabled = true")
+    , @NamedQuery(name = "Users.findByBlocked", query = "SELECT u FROM Users u WHERE u.blocked = :blocked and u.enabled = true")
+    , @NamedQuery(name = "Users.findByDatacadastro", query = "SELECT u FROM Users u WHERE u.datacadastro = :datacadastro and u.enabled = true")
+    , @NamedQuery(name = "Users.findAllCuidadores", query = "SELECT u FROM Users u WHERE u.typeuser = 2 and u.enabled = true")
+    , @NamedQuery(name = "Users.findCuidadorByEmail", query = "SELECT u FROM Users u WHERE u.typeuser = 2 and u.email = :email")
+    , @NamedQuery(name = "Users.findCuidadorByNome", query = "SELECT u FROM Users u WHERE u.typeuser = 2 and u.nome = :nome")
+    ,@NamedQuery(name = "Users.likeCuidadorByEmail", query = "SELECT u FROM Users u WHERE u.typeuser = 2 and u.email like :email")
+    , @NamedQuery(name = "Users.likeCuidadorByNome", query = "SELECT u FROM Users u WHERE u.typeuser = 2 and u.nome like :nome")})
+@NamedNativeQueries({
+	@NamedNativeQuery(name = "Users.findCuidadorByPaciente", query = "SELECT u.* FROM users u inner join users_paciente up on u.email = up.email where u.typeuser = 2 and up.idpaciente = ?1")
+})
 public class Users implements Serializable {
 
     @Basic(optional = false)
     @Column(name = "alterLogin")
     @Temporal(TemporalType.TIMESTAMP)
     private Date alterLogin;
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "email", fetch = FetchType.LAZY)
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "users", fetch = FetchType.LAZY)
     private List<UsersPaciente> usersPacienteList;
 
     private static final long serialVersionUID = 1L;
@@ -82,6 +92,10 @@ public class Users implements Serializable {
     @Column(name = "activation")
     @Temporal(TemporalType.TIMESTAMP)
     private Date activation;
+    @NotNull
+    @Column(name = "enabled")
+    
+    private Boolean enabled = true;
 
     public Users() {
     }
@@ -105,6 +119,13 @@ public class Users implements Serializable {
            this.nome = nome;
     }
 
+	public Boolean isEnabled() {
+		return enabled;
+	}
+
+	public void setEnabled(Boolean enabled) {
+		this.enabled = enabled;
+	}
     public String getEmail() {
         return email;
     }

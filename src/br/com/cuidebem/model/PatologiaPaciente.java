@@ -15,6 +15,8 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.NamedNativeQueries;
+import javax.persistence.NamedNativeQuery;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.Table;
@@ -33,6 +35,9 @@ import javax.xml.bind.annotation.XmlRootElement;
     @NamedQuery(name = "PatologiaPaciente.findAll", query = "SELECT p FROM PatologiaPaciente p")
     , @NamedQuery(name = "PatologiaPaciente.findByIdpatologiaPaciente", query = "SELECT p FROM PatologiaPaciente p WHERE p.idpatologiaPaciente = :idpatologiaPaciente")
     , @NamedQuery(name = "PatologiaPaciente.findByPatologia", query = "SELECT p FROM PatologiaPaciente p WHERE p.patologia = :patologia")})
+@NamedNativeQueries({
+	@NamedNativeQuery(name="PatologiaPaciente.findByIdPaciente",query="SELECT * FROM patologia_paciente where idpaciente = ?1",resultClass=PatologiaPaciente.class)
+})
 public class PatologiaPaciente implements Serializable {
 
     private static final long serialVersionUID = 1L;

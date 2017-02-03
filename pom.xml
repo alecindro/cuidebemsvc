@@ -30,5 +30,10 @@
     <version>2.0.1</version>
     <scope>provided</scope>
 </dependency>
+  	<dependency>
+  		<groupId>authsvc</groupId>
+  		<artifactId>authsvc</artifactId>
+  		<version>0.0.1-SNAPSHOT</version>
+  	</dependency>
   </dependencies>
 </project>

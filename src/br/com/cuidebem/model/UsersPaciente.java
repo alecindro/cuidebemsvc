@@ -15,6 +15,8 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.NamedNativeQueries;
+import javax.persistence.NamedNativeQuery;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.Table;
@@ -31,7 +33,12 @@ import javax.xml.bind.annotation.XmlRootElement;
 @NamedQueries({
     @NamedQuery(name = "UsersPaciente.findAll", query = "SELECT u FROM UsersPaciente u")
     , @NamedQuery(name = "UsersPaciente.findByIdusersPaciente", query = "SELECT u FROM UsersPaciente u WHERE u.idusersPaciente = :idusersPaciente")
-    , @NamedQuery(name = "UsersPaciente.findByPrincipal", query = "SELECT u FROM UsersPaciente u WHERE u.principal = :principal")})
+    , @NamedQuery(name = "UsersPaciente.findByPrincipal", query = "SELECT u FROM UsersPaciente u WHERE u.principal = :principal")
+   })
+@NamedNativeQueries({
+	@NamedNativeQuery(name="UsersPaciente.findByEmail", query="SELECT * FROM users_paciente where email = ?1", resultClass=UsersPaciente.class)
+	,@NamedNativeQuery(name="UsersPaciente.findByIdPaciente", query="SELECT * FROM users_paciente where idpaciente = ?1", resultClass=UsersPaciente.class)
+})
 public class UsersPaciente implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -45,11 +52,11 @@ public class UsersPaciente implements Serializable {
     @Column(name = "principal")
     private boolean principal;
     @JoinColumn(name = "idpaciente", referencedColumnName = "idpaciente")
-    @ManyToOne(optional = false, fetch = FetchType.LAZY)
+    @ManyToOne(optional = false, fetch = FetchType.EAGER)
     private Paciente idpaciente;
     @JoinColumn(name = "email", referencedColumnName = "email")
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
-    private Users email;
+    private Users users;
 
     public UsersPaciente() {
     }
@@ -71,7 +78,7 @@ public class UsersPaciente implements Serializable {
         this.idusersPaciente = idusersPaciente;
     }
 
-    public boolean getPrincipal() {
+    public boolean isPrincipal() {
         return principal;
     }
 
@@ -87,12 +94,12 @@ public class UsersPaciente implements Serializable {
         this.idpaciente = idpaciente;
     }
 
-    public Users getEmail() {
-        return email;
+    public Users getUsers() {
+        return users;
     }
 
-    public void setEmail(Users email) {
-        this.email = email;
+    public void setUsers(Users email) {
+        this.users = email;
     }
 
     @Override

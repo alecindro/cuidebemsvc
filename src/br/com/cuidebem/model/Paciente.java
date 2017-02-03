@@ -6,8 +6,11 @@
 package br.com.cuidebem.model;
 
 import java.io.Serializable;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
+
 import javax.persistence.Basic;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -16,12 +19,15 @@ import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.NamedNativeQueries;
+import javax.persistence.NamedNativeQuery;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
+import javax.persistence.Transient;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import javax.xml.bind.annotation.XmlRootElement;
@@ -35,13 +41,16 @@ import javax.xml.bind.annotation.XmlTransient;
 @Table(name = "paciente")
 @XmlRootElement
 @NamedQueries({
-    @NamedQuery(name = "Paciente.findAll", query = "SELECT p FROM Paciente p")
-    , @NamedQuery(name = "Paciente.findByIdpaciente", query = "SELECT p FROM Paciente p WHERE p.idpaciente = :idpaciente")
-    , @NamedQuery(name = "Paciente.findByNome", query = "SELECT p FROM Paciente p WHERE p.nome = :nome")
-    , @NamedQuery(name = "Paciente.findBySobrenome", query = "SELECT p FROM Paciente p WHERE p.sobrenome = :sobrenome")
-    , @NamedQuery(name = "Paciente.findByGenero", query = "SELECT p FROM Paciente p WHERE p.genero = :genero")
-    , @NamedQuery(name = "Paciente.findByDtnascimento", query = "SELECT p FROM Paciente p WHERE p.dtnascimento = :dtnascimento")
-    , @NamedQuery(name = "Paciente.findByPlanosaude", query = "SELECT p FROM Paciente p WHERE p.planosaude = :planosaude")})
+    @NamedQuery(name = "Paciente.findAll", query = "SELECT p FROM Paciente p where p.enabled = true")
+    , @NamedQuery(name = "Paciente.findByIdpaciente", query = "SELECT p FROM Paciente p WHERE p.idpaciente = :idpaciente AND p.enabled = true")
+    , @NamedQuery(name = "Paciente.findByNome", query = "SELECT p FROM Paciente p WHERE p.nome = :nome AND p.enabled = true")
+    , @NamedQuery(name = "Paciente.findBySobrenome", query = "SELECT p FROM Paciente p WHERE p.sobrenome = :sobrenome AND p.enabled = true")
+    , @NamedQuery(name = "Paciente.findByGenero", query = "SELECT p FROM Paciente p WHERE p.genero = :genero and p.enabled = true")
+    , @NamedQuery(name = "Paciente.findByDtnascimento", query = "SELECT p FROM Paciente p WHERE p.dtnascimento = :dtnascimento AND p.enabled = true")
+    , @NamedQuery(name = "Paciente.findByPlanosaude", query = "SELECT p FROM Paciente p WHERE p.planosaude = :planosaude AND p.enabled = true")})
+@NamedNativeQueries({
+	@NamedNativeQuery(name="Paciente.findByUser", query="select p.* from paciente p inner join users_paciente up on p.idpaciente= up.idpaciente where up.email = ?1 AND p.enabled = 1", resultClass=Paciente.class)
+})
 public class Paciente implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -70,6 +79,12 @@ public class Paciente implements Serializable {
     private String planosaude;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "idpaciente", fetch = FetchType.LAZY)
     private List<PatologiaPaciente> patologiaPacienteList;
+    @NotNull
+    @Column(name = "enabled")
+    private Boolean enabled = true;
+
+    @Transient
+    private String dtnascimentoStr;
   
 
     public Paciente() {
@@ -95,6 +110,16 @@ public class Paciente implements Serializable {
 		this.dtnascimento = dtnascimento;
 		this.planosaude = planosaude;
 		
+	}
+    
+    
+
+	public Boolean isEnabled() {
+		return enabled;
+	}
+
+	public void setEnabled(Boolean enabled) {
+		this.enabled = enabled;
 	}
 
 	public Integer getIdpaciente() {
@@ -144,8 +169,32 @@ public class Paciente implements Serializable {
     public void setPlanosaude(String planosaude) {
         this.planosaude = planosaude;
     }
+    
+    
 
-    @XmlTransient
+    public String getDtnascimentoStr() {
+    	if(dtnascimento != null){
+    		try {
+				dtnascimentoStr = convert(dtnascimento, "yyyy-MM-dd");
+			} catch (ParseException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+    	}
+		return dtnascimentoStr;
+	}
+
+	public void setDtnascimentoStr(String dtnascimentoStr) {
+		this.dtnascimentoStr = dtnascimentoStr;
+		try {
+			this.dtnascimento = convert(dtnascimentoStr, "yyyy-MM-dd");
+		} catch (ParseException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+
+	@XmlTransient
     public List<PatologiaPaciente> getPatologiaPacienteList() {
         return patologiaPacienteList;
     }
@@ -178,5 +227,17 @@ public class Paciente implements Serializable {
     public String toString() {
         return "br.com.cuidebem.model.Paciente[ idpaciente=" + idpaciente + " ]";
     }
+    
+	private static Date convert(String dateinput, String pattern) throws ParseException{
+		SimpleDateFormat formatDate = new SimpleDateFormat(pattern);
+		return formatDate.parse(dateinput);
+	}
+	
+	private static String convert(Date dateinput, String pattern) throws ParseException{
+		SimpleDateFormat formatDate = new SimpleDateFormat(pattern);
+		return formatDate.format(dateinput);
+	}
+	
+
     
 }

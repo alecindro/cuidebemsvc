@@ -28,5 +28,14 @@ public enum Patologias {
 		return descricao;
 	}
 	
+	
+	public static Patologias find(String descricao){
+		for(Patologias patologia : Patologias.values()){
+		if(patologia.getDescricao().equals(descricao)){
+			return patologia;
+		}
+		}
+		return null;
+	}
 	 
 }

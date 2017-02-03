@@ -6,14 +6,16 @@
 package br.com.cuidebem.service;
 
 import java.util.Date;
+import java.util.List;
 
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 
-import br.com.cuidebem.control.exceptions.DaoException;
-import br.com.cuidebem.control.exceptions.PreexistingEntityException;
+import br.com.cuidebem.exceptions.DaoException;
+import br.com.cuidebem.exceptions.PreexistingEntityException;
 import br.com.cuidebem.model.Users;
+import br.com.security.quali.password.UtilPassword;
 
 /**
  *
@@ -46,4 +48,23 @@ public class UsersDao extends AbstractDao<Users> {
     	edit(user);
     }
     
+    public void updatePassword(String email, String newPassword) throws DaoException{
+    	Users user = find(email);
+    	if(user != null){
+    		String password = UtilPassword.genPassword(newPassword);
+    		user.setPassword(password);
+    		edit(user);
+    	}
+    }
+    
+    public List<Users> findColaboradoresByPaciente(Integer idpaciente) throws DaoException{
+    	 return findByNativeQuery("Users.findCuidadorByPaciente", idpaciente);
+    }
+    
+    public List<Users> findColaboradoresByNome(String nome) throws DaoException{
+    	return findWithNamedQuery("Users.likeCuidadorByNome", QueryParameter.init("nome", "%"+nome+"%"), 0);
+    }
+    public List<Users> findColaboradoresByEmail(String email) throws DaoException{
+    	return findWithNamedQuery("Users.likeCuidadorByEmail", QueryParameter.init("nome", "%"+email+"%"), 0);
+    }
 }

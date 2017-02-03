@@ -6,14 +6,17 @@
 package br.com.cuidebem.service;
 
 import java.util.List;
+import java.util.Map.Entry;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.persistence.EntityManager;
+import javax.persistence.Query;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Selection;
 
-import br.com.cuidebem.control.exceptions.DaoException;
+import br.com.cuidebem.exceptions.DaoException;
 
 /**
  *
@@ -35,10 +38,10 @@ public abstract class AbstractDao<T> {
 
 	public T create(T entity) throws DaoException {
 		try {
-			getLogger().log(Level.FINE, "Salvando " + entity.toString());
+			getLogger().log(Level.INFO, "Salvando " + entity.toString());
 			getEntityManager().persist(entity);
 			getEntityManager().flush();
-			getLogger().log(Level.FINE, "Salvou " + entity.toString());
+			getLogger().log(Level.INFO, "Salvou " + entity.toString());
 			return entity;
 		} catch (Exception e) {
 			throw new DaoException(e.getMessage(), e);
@@ -72,6 +75,43 @@ public abstract class AbstractDao<T> {
 		} catch (Exception e) {
 			throw new DaoException(e.getMessage(), e);
 		}
+	}
+	
+	public List<T> findWithNamedQuery(String namedQueryName,
+			QueryParameter parameters, int resultLimit) throws DaoException {
+		try {
+		EntityManager em = getEntityManager();
+		Set<Entry<String, Object>> rawParameters = parameters.getParameters()
+				.entrySet();
+		Query query = em.createNamedQuery(namedQueryName);
+
+		if (resultLimit > 0)
+			query.setMaxResults(resultLimit);
+		for (Entry entry : rawParameters) {
+			query.setParameter((String) entry.getKey(), entry.getValue());
+		}
+		return query.getResultList();
+		} catch (Exception e) {
+			throw new DaoException(e.getMessage(), e);
+		}
+	}
+	
+	public List<T> findByNativeQuery(String namedQuery,Object... parameters) throws DaoException{
+		try{
+		javax.persistence.Query query = getEntityManager().createNamedQuery(namedQuery);
+		if(parameters != null){
+			int i = 1;
+			for(Object parameter : parameters){
+				query.setParameter(i, parameter);
+				i = i+1;
+			}
+		}
+		
+			return query.getResultList();
+		}catch(Exception e){
+			throw new DaoException(e.getMessage(), e);
+		}
+		
 	}
 
 	public List<T> findAll() throws DaoException {
