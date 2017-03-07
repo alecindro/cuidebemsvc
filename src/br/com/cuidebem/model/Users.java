@@ -48,7 +48,8 @@ import javax.xml.bind.annotation.XmlTransient;
     ,@NamedQuery(name = "Users.likeCuidadorByEmail", query = "SELECT u FROM Users u WHERE u.typeuser = 2 and u.email like :email")
     , @NamedQuery(name = "Users.likeCuidadorByNome", query = "SELECT u FROM Users u WHERE u.typeuser = 2 and u.nome like :nome")})
 @NamedNativeQueries({
-	@NamedNativeQuery(name = "Users.findCuidadorByPaciente", query = "SELECT u.* FROM users u inner join users_paciente up on u.email = up.email where u.typeuser = 2 and up.idpaciente = ?1")
+	@NamedNativeQuery(name = "Users.findCuidadorByPaciente", query = "SELECT u.* FROM users u inner join users_paciente up on u.email = up.email where u.typeuser = 2 and up.idpaciente = ?1", resultClass=Users.class)
+	,@NamedNativeQuery(name = "Users.findCuidadorByListPaciente", query = "SELECT u.* FROM users u inner join users_paciente up on u.email = up.email where u.typeuser = 2 and up.idpaciente in (?2)", resultClass=Users.class)
 })
 public class Users implements Serializable {
 
@@ -94,8 +95,13 @@ public class Users implements Serializable {
     private Date activation;
     @NotNull
     @Column(name = "enabled")
-    
     private Boolean enabled = true;
+    @Size(max = 255)
+    @Column(name = "telefoneWhats")
+    private String telefoneWhats;
+    @Size(max = 255)
+    @Column(name = "telefone")
+    private String telefone;
 
     public Users() {
     }
@@ -173,8 +179,26 @@ public class Users implements Serializable {
     public void setDatacadastro(Date datacadastro) {
         this.datacadastro = datacadastro;
     }
+    
+    
 
-    @Override
+    public String getTelefoneWhats() {
+		return telefoneWhats;
+	}
+
+	public void setTelefoneWhats(String telefoneWhats) {
+		this.telefoneWhats = telefoneWhats;
+	}
+
+	public String getTelefone() {
+		return telefone;
+	}
+
+	public void setTelefone(String telefone) {
+		this.telefone = telefone;
+	}
+
+	@Override
     public int hashCode() {
         int hash = 0;
         hash += (email != null ? email.hashCode() : 0);

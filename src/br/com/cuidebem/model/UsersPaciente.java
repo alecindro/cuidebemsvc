@@ -57,6 +57,10 @@ public class UsersPaciente implements Serializable {
     @JoinColumn(name = "email", referencedColumnName = "email")
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     private Users users;
+    @Basic(optional = false)
+    @NotNull
+    @Column(name = "enabled")
+    private Boolean enabled = false;
 
     public UsersPaciente() {
     }
@@ -101,8 +105,18 @@ public class UsersPaciente implements Serializable {
     public void setUsers(Users email) {
         this.users = email;
     }
+    
+    
 
-    @Override
+    public Boolean isEnabled() {
+		return enabled;
+	}
+
+	public void setEnabled(Boolean enabled) {
+		this.enabled = enabled;
+	}
+
+	@Override
     public int hashCode() {
         int hash = 0;
         hash += (idusersPaciente != null ? idusersPaciente.hashCode() : 0);

@@ -11,7 +11,9 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Selection;
@@ -22,6 +24,7 @@ import br.com.cuidebem.exceptions.DaoException;
  *
  * @author aleci
  */
+
 public abstract class AbstractDao<T> {
 
 	private Class<T> entityClass;
@@ -34,6 +37,8 @@ public abstract class AbstractDao<T> {
 		return Logger.getLogger(entityClass.getName());
 	}
 
+
+	
 	protected abstract EntityManager getEntityManager() throws DaoException;
 
 	public T create(T entity) throws DaoException {
