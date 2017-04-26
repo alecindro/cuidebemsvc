@@ -49,7 +49,7 @@ import javax.xml.bind.annotation.XmlTransient;
     , @NamedQuery(name = "Paciente.findByDtnascimento", query = "SELECT p FROM Paciente p WHERE p.dtnascimento = :dtnascimento AND p.enabled = true")
     , @NamedQuery(name = "Paciente.findByPlanosaude", query = "SELECT p FROM Paciente p WHERE p.planosaude = :planosaude AND p.enabled = true")})
 @NamedNativeQueries({
-	@NamedNativeQuery(name="Paciente.findByUser", query="select p.* from paciente p inner join users_paciente up on p.idpaciente= up.idpaciente where up.email = ?1 AND p.enabled = 1", resultClass=Paciente.class)
+	@NamedNativeQuery(name="Paciente.findByUser", query="select p.* from paciente p inner join users_paciente up on p.idpaciente= up.idpaciente where up.email = ?1 AND p.enabled = 1 AND up.enabled = 1", resultClass=Paciente.class)
 })
 public class Paciente implements Serializable {
 

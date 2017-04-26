@@ -39,11 +39,12 @@ public class PacienteDao extends AbstractDao<Paciente> {
 		return em;
 	}
 
-	public void save(Paciente paciente, String email, List<String> patologias, boolean principal) throws DaoException {
+	public Paciente save(Paciente paciente, Users user, List<String> patologias, boolean principal) throws DaoException {
 		if (paciente.getIdpaciente() == null) {
+			paciente.setEnabled(true);
 			paciente = create(paciente);
 
-			Users user = usersDao.find(email);
+			//Users user = usersDao.find(email);
 			UsersPaciente usersPaciente = new UsersPaciente();
 			usersPaciente.setUsers(user);
 			usersPaciente.setIdpaciente(paciente);
@@ -58,8 +59,10 @@ public class PacienteDao extends AbstractDao<Paciente> {
 					getLogger().log(Level.INFO, "Erro ao salvar patologia do paciente", e);
 				}
 			}
+			return paciente;
 		} else {
-			editPaciente(paciente, email, patologias, principal);
+			 editPaciente(paciente, user.getEmail(), patologias, principal);
+			 return paciente;
 		}
 	}
 

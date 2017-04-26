@@ -36,7 +36,8 @@ import javax.xml.bind.annotation.XmlRootElement;
     , @NamedQuery(name = "UsersPaciente.findByPrincipal", query = "SELECT u FROM UsersPaciente u WHERE u.principal = :principal")
    })
 @NamedNativeQueries({
-	@NamedNativeQuery(name="UsersPaciente.findByEmail", query="SELECT * FROM users_paciente where email = ?1", resultClass=UsersPaciente.class)
+	@NamedNativeQuery(name="UsersPaciente.findByEmail", query="SELECT * FROM users_paciente where email = ?1", resultClass=UsersPaciente.class),
+	@NamedNativeQuery(name="UsersPaciente.findByCuidadorPaciente", query="SELECT * FROM users_paciente where email = ?1 and idpaciente = ?2", resultClass=UsersPaciente.class)
 	,@NamedNativeQuery(name="UsersPaciente.findByIdPaciente", query="SELECT * FROM users_paciente where idpaciente = ?1", resultClass=UsersPaciente.class)
 })
 public class UsersPaciente implements Serializable {

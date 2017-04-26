@@ -48,7 +48,7 @@ import javax.xml.bind.annotation.XmlTransient;
     ,@NamedQuery(name = "Users.likeCuidadorByEmail", query = "SELECT u FROM Users u WHERE u.typeuser = 2 and u.email like :email")
     , @NamedQuery(name = "Users.likeCuidadorByNome", query = "SELECT u FROM Users u WHERE u.typeuser = 2 and u.nome like :nome")})
 @NamedNativeQueries({
-	@NamedNativeQuery(name = "Users.findCuidadorByPaciente", query = "SELECT u.* FROM users u inner join users_paciente up on u.email = up.email where u.typeuser = 2 and up.idpaciente = ?1", resultClass=Users.class)
+	@NamedNativeQuery(name = "Users.findCuidadorByPaciente", query = "SELECT u.* FROM users u inner join users_paciente up on u.email = up.email where u.typeuser = 2 and up.enabled = 1 and up.idpaciente = ?1", resultClass=Users.class)
 	,@NamedNativeQuery(name = "Users.findCuidadorByListPaciente", query = "SELECT u.* FROM users u inner join users_paciente up on u.email = up.email where u.typeuser = 2 and up.idpaciente in (?2)", resultClass=Users.class)
 })
 public class Users implements Serializable {

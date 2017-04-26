@@ -39,13 +39,18 @@ public class ConvitecuidadorDAO extends AbstractDao<Convitecuidador>{
 	public void aceitarConvite(Users cuidador, Convitecuidador convitecuidador) throws DaoException{
 		convitecuidador.setPendente(false);
 		edit(convitecuidador);
+		List<UsersPaciente> ups =usersPacienteDao.findByNativeQuery("UsersPaciente.findByCuidadorPaciente", cuidador.getEmail(),convitecuidador.getIdpaciente().getIdpaciente());
+		if(!ups.isEmpty()){
+			UsersPaciente up = ups.get(0);
+		    up.setEnabled(true);
+		}else{
 		UsersPaciente up = new UsersPaciente();
 		up.setIdpaciente(convitecuidador.getIdpaciente());
 		up.setUsers(cuidador);
 		up.setEnabled(true);
 		up.setPrincipal(false);
 		usersPacienteDao.create(up);
-		
+		}
 	}
 	
 }

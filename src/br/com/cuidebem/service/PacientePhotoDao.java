@@ -10,6 +10,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 
 import br.com.cuidebem.exceptions.DaoException;
+import br.com.cuidebem.model.Paciente;
 import br.com.cuidebem.model.PacientePhoto;
 
 @Stateless
@@ -46,14 +47,15 @@ public class PacientePhotoDao  extends AbstractDao<PacientePhoto> {
 		return photo;
 	}
 	
-	public PacientePhoto savePhoto(Integer idpaciente, InputStream photo) throws DaoException{
+	public PacientePhoto savePhoto(Paciente paciente, InputStream photo) throws DaoException{
 		try {
 			ByteArrayOutputStream baos = new ByteArrayOutputStream();
 			PhotoUtil.resize(photo, baos);
 			baos.flush();
 			byte[] imageInByte = baos.toByteArray();
 			PacientePhoto pacientePhoto = new PacientePhoto();
-			pacientePhoto.setIdpaciente(idpaciente);
+			pacientePhoto.setIdpaciente(paciente.getIdpaciente());
+			pacientePhoto.setPaciente(paciente);
 			pacientePhoto.setPhoto(imageInByte);
 			PacientePhoto result =  savePhoto(pacientePhoto);
 			baos.close();
